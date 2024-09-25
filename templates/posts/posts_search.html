@@ -1,0 +1,45 @@
+{% extends 'layouts/default.html' %}
+
+{% load custom_tags %}
+
+{% block title %}
+Search
+{% endblock title %}
+
+{% block content %}
+    <h1>Поиск по статьям</h1>
+    <button><a href="{% url 'posts:posts_list' %}"><h2>Return to all</h2></a></button>
+    <form action="" method="get">
+       {{ filterset.form.as_p }}
+       <input type="submit" value="Найти" />
+   </form>
+   <h1>Все статьи</h1>
+   {% if posts %}
+        {% for post in posts %}
+            <a href="{% url 'posts:post_detail'  post.id %}"><h2>{{post.title}}</h2></a>
+            <p>{{post.text|truncatechars:25}}</p>
+            <p>{{post.created_at}}</p>
+        {% endfor %}
+   {% else %}
+       <h2>Статей нет!</h2>
+   {% endif %}
+
+   {% if page_obj.has_previous %}
+       {# Для каждой ссылки пагинации указываем обработку через новый тег #}
+       <a href="?{% url_replace page=1 %}">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+{% endblock content %}
