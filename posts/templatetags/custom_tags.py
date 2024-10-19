@@ -1,9 +1,9 @@
 from django import template
 
-
 register = template.Library()
 
-bad_words = ['f[ae]y?g+[oeiu]+t+s?', 'даунская', 'пидорасы', 'ching\W*chongs?', 'n󠀡󠀡iggers', 'nigga', 'моноспектакля', 'обстрела', 'рецензента']
+bad_words = ['f[ae]y?g+[oeiu]+t+s?', 'даунская', 'пидорасы', 'n󠀡󠀡iggers', 'nigga',
+             'моноспектакля', 'обстрела', 'рецензента']
 
 
 @register.filter()

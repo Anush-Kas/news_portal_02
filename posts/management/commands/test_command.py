@@ -1,18 +1,16 @@
 import logging
-
-from django.conf import settings
+from datetime import datetime, timedelta
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.core.management.base import BaseCommand
+from django_apscheduler import util
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
-from django_apscheduler import util
-from django.core.mail import EmailMultiAlternatives
 
-from datetime import datetime, timedelta
-
-from posts.models import Post, User, Category
+from posts.models import Category, Post, User
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +23,7 @@ def my_job():
         posts = Post.objects.filter(category__in=user_categories).filter(created_at__gt=date)
         text = ''
         html_content = ''
-        subject = f'Новые статьи в категориях'
+        subject = 'Новые статьи в категориях'
         for post in posts:
             text += (
                 f'{post.title}\n'

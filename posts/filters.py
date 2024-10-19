@@ -1,5 +1,5 @@
-from django_filters import FilterSet, CharFilter, DateTimeFilter, ChoiceFilter
 from django import forms
+from django_filters import CharFilter, ChoiceFilter, DateTimeFilter, FilterSet
 
 from .models import Post
 

@@ -7,21 +7,29 @@
 
 {% block content %}
     <h1>Все статьи</h1>
-    {% if perms.posts.add_post %}
-    <button><a href="{% url 'posts:post_create' %}"><h2>Create post</h2></a></button>
-    {% endif %}
-    <button><a href="{% url 'posts:posts_search' %}"><h2>Search post</h2></a></button>
+    <section class="grid">
+        {% if perms.posts.add_post %}
+        <a href="{% url 'posts:post_create' %}" role="button">Create post</a>
+        {% endif %}
+        <a href="{% url 'posts:posts_search' %}" role="button">Search post</a>
+    </section>
     {% if posts %}
         {% for post in posts %}
-            <a href="{% url 'posts:post_detail'  post.id %}"><h2>{{post.title}}</h2></a>
-            <p>{{post.text|truncatechars:25}}</p>
-            <p>{{post.created_at}}</p>
+            <article>
+                <header>
+                    <a href="{% url 'posts:post_detail'  post.id %}"><h2>{{post.title}}</h2></a>
+                </header>
+                <p>{{post.text|truncatechars:25}}</p>
+                <footer>
+                <small>{{post.created_at}}</small>
+                </footer>
+            </article>
         {% endfor %}
    {% else %}
        <h2>Статей нет!</h2>
    {% endif %}
 
-
+    <section>
    {% if page_obj.has_previous %}
        <a href="?{% url_replace page=1 %}">1</a>
        {% if page_obj.previous_page_number != 1 %}
@@ -39,5 +47,5 @@
            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
         {% endif %}
    {% endif %}
-
+    </section>
 {% endblock content %}

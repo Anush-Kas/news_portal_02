@@ -1,15 +1,18 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from datetime import datetime
-from django.contrib.auth.decorators import login_required
-from django.db.models import Exists, OuterRef
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect
 
-from .models import Post, Author, Subscription, Category
-from .forms import PostForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.cache import cache
+from django.db.models import Exists, OuterRef
+from django.shortcuts import render, reverse
+from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_protect
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView)
+
 from .filters import PostFilter
+from .forms import PostForm
+from .models import Category, Post, Subscription
 
 
 class PostList(ListView):
@@ -18,6 +21,13 @@ class PostList(ListView):
     template_name = 'posts/posts_list.html'
     context_object_name = 'posts'
     paginate_by = 1
+
+    def get_absolute_url(self):  # добавим абсолютный путь, чтобы после создания нас перебрасывало на страницу с товаром
+        return reverse('newsportal:post_list', args=[str(self.id)])
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
+        cache.delete(f'post-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
 
 
 class PostSearch(ListView):
@@ -43,6 +53,19 @@ class PostDetail(DetailView):
     model = Post
     template_name = 'posts/post_detail.html'
     context_object_name = 'post'
+    queryset = Post.objects.all()
+
+    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+        obj = cache.get(f'post-{self.kwargs["pk"]}',
+                        None)
+        # кэш очень похож на словарь, и метод get действует так же.
+        # Он забирает значение по ключу, если его нет, то забирает None.
+
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+        return obj
 
 
 class PostCreate(PermissionRequiredMixin, CreateView):

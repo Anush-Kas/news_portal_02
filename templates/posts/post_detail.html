@@ -9,6 +9,8 @@
    <h1>{{ post.title}}</h1>
    <p>{{ post.created_at }}</p>
    <h5>{{ post.text }}</h5>
-    <button><a href="{% url 'posts:post_delete' pk=post.id %}"><h4>delete</h4></a></button>
-    <button><a href="{% url 'posts:post_update' pk=post.id %}"><h4>update</h4></a></button>
+    <div class="grid">
+        <a href="{% url 'posts:post_delete' pk=post.id %}" role="button"><h4>delete</h4></a>
+        <a href="{% url 'posts:post_update' pk=post.id %}" role="button"><h4>update</h4></a>
+    </div>
 {% endblock content %}
