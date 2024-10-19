@@ -20,7 +20,7 @@ class PostList(ListView):
     ordering = '-created_at'
     template_name = 'posts/posts_list.html'
     context_object_name = 'posts'
-    paginate_by = 1
+    paginate_by = 10
 
     def get_absolute_url(self):  # добавим абсолютный путь, чтобы после создания нас перебрасывало на страницу с товаром
         return reverse('newsportal:post_list', args=[str(self.id)])
