@@ -7,16 +7,20 @@ Search
 {% endblock title %}
 
 {% block content %}
-    <h1>Поиск по статьям</h1>
+    <h1>Поиск по публикациям</h1>
     <a href="{% url 'posts:posts_list' %}" role="button"><h2>Return to all</h2></a>
     <form action="" method="get">
        {{ filterset.form.as_p }}
        <input type="submit" value="Найти" />
    </form>
-   <h1>Все статьи</h1>
+   <h1>Все публикации</h1>
    {% if posts %}
         {% for post in posts %}
-            <a href="{% url 'posts:post_detail'  post.id %}"><h2>{{post.title}}</h2></a>
+            {% if post.kind == "AR" %}
+                <a href="{% url 'posts:article_detail'  post.id %}"><h2>{{post.title}}</h2></a>
+            {% elif post.kind == "NW" %}
+                <a href="{% url 'posts:news_detail'  post.id %}"><h2>{{post.title}}</h2></a>
+            {% endif %}
             <p>{{post.text|truncatechars:25}}</p>
             <p>{{post.created_at}}</p>
         {% endfor %}

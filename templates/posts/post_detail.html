@@ -10,7 +10,12 @@
    <p>{{ post.created_at }}</p>
    <h5>{{ post.text }}</h5>
     <div class="grid">
-        <a href="{% url 'posts:post_delete' pk=post.id %}" role="button"><h4>delete</h4></a>
-        <a href="{% url 'posts:post_update' pk=post.id %}" role="button"><h4>update</h4></a>
+        {% if post.kind == "AR" %}
+        <a href="{% url 'posts:article_delete' pk=post.id %}" role="button"><h4>delete</h4></a>
+        <a href="{% url 'posts:article_update' pk=post.id %}" role="button"><h4>update</h4></a>
+        {% elif post.kind == "NW" %}
+        <a href="{% url 'posts:news_delete' pk=post.id %}" role="button"><h4>delete</h4></a>
+        <a href="{% url 'posts:news_update' pk=post.id %}" role="button"><h4>update</h4></a>
+        {% endif %}
     </div>
 {% endblock content %}

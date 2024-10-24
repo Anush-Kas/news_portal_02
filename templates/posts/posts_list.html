@@ -6,10 +6,11 @@
 {% endblock title %}
 
 {% block content %}
-    <h1>Все статьи</h1>
+    <h1>Все публикации</h1>
     <section class="grid">
         {% if perms.posts.add_post %}
-        <a href="{% url 'posts:post_create' %}" role="button">Create post</a>
+        <a href="{% url 'posts:news_create' %}" role="button">Create news</a>
+        <a href="{% url 'posts:article_create' %}" role="button">Create article</a>
         {% endif %}
         <a href="{% url 'posts:posts_search' %}" role="button">Search post</a>
     </section>
@@ -17,7 +18,11 @@
         {% for post in posts %}
             <article>
                 <header>
-                    <a href="{% url 'posts:post_detail'  post.id %}"><h2>{{post.title}}</h2></a>
+                    {% if post.kind == "AR" %}
+                        <a href="{% url 'posts:article_detail'  post.id %}"><h2>{{post.title}}</h2></a>
+                    {% elif post.kind == "NW" %}
+                        <a href="{% url 'posts:news_detail'  post.id %}"><h2>{{post.title}}</h2></a>
+                    {% endif %}
                 </header>
                 <p>{{post.text|truncatechars:25}}</p>
                 <footer>

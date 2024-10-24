@@ -49,26 +49,21 @@ class PostSearch(ListView):
         return context
 
 
-class PostDetail(DetailView):
+class NewsDetail(DetailView):
     model = Post
     template_name = 'posts/post_detail.html'
     context_object_name = 'post'
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(kind='NW')
 
-    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
-        obj = cache.get(f'post-{self.kwargs["pk"]}',
-                        None)
-        # кэш очень похож на словарь, и метод get действует так же.
-        # Он забирает значение по ключу, если его нет, то забирает None.
-
-        # если объекта нет в кэше, то получаем его и записываем в кэш
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
         if not obj:
             obj = super().get_object(queryset=self.queryset)
             cache.set(f'post-{self.kwargs["pk"]}', obj)
         return obj
 
 
-class PostCreate(PermissionRequiredMixin, CreateView):
+class NewsCreate(PermissionRequiredMixin, CreateView):
     permission_required = ('posts.add_post',)
     form_class = PostForm
     model = Post
@@ -76,22 +71,62 @@ class PostCreate(PermissionRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        form.instance.kind = 'NW'
         return super().form_valid(form)
 
 
-class PostUpdate(PermissionRequiredMixin, UpdateView):
+class NewsUpdate(PermissionRequiredMixin, UpdateView):
     permission_required = ('posts.change_post',)
+    form_class = PostForm
+    queryset = Post.objects.filter(kind='NW')
+    template_name = 'posts/post_edit.html'
+
+
+class NewsDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('posts.delete_post',)
+    queryset = Post.objects.filter(kind='NW')
+    template_name = 'posts/post_delete.html'
+    success_url = reverse_lazy('posts:posts_list')
+
+
+class ArticleDetail(DetailView):
+    model = Post
+    template_name = 'posts/post_detail.html'
+    context_object_name = 'post'
+    queryset = Post.objects.filter(kind='AR')
+
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+        return obj
+
+
+class ArticleCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('posts.add_post',)
     form_class = PostForm
     model = Post
     template_name = 'posts/post_edit.html'
 
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.kind = 'AR'
+        return super().form_valid(form)
 
-class PostDelete(PermissionRequiredMixin, DeleteView):
+
+class ArticleUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('posts.change_post',)
+    form_class = PostForm
+    queryset = Post.objects.filter(kind='AR')
+    template_name = 'posts/post_edit.html'
+
+
+class ArticleDelete(PermissionRequiredMixin, DeleteView):
     permission_required = ('posts.delete_post',)
-    model = Post
+    queryset = Post.objects.filter(kind='AR')
     template_name = 'posts/post_delete.html'
     success_url = reverse_lazy('posts:posts_list')
-
 
 @login_required
 @csrf_protect
